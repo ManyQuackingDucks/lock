@@ -1,4 +1,8 @@
 #[test]
+fn test_new(){
+    let _ = lock::Lock::new(5);
+}
+#[test]
 fn test_deref(){
     static mut LOCK: lock::Lock<u8> = lock::Lock::new(5);
     let mut guard  = unsafe { LOCK.lock().unwrap() };
