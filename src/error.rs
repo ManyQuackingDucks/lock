@@ -5,6 +5,7 @@ pub enum Kind {
 }
 
 impl std::fmt::Display for Kind {
+    #[no_coverage] //We dont expect the formater to be tested
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::AlreadyLocked => write!(f, "The state is already locked and it could not lock"),
