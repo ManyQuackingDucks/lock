@@ -6,6 +6,5 @@
         pkgs.clippy
 		pkgs.cargo-edit
         pkgs.rust-analyzer
-        pkgs.cargo-tarpaulin
 	];
 }
