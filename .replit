@@ -1,6 +1,6 @@
-run = ["cargo", "run"]
+run = ["cargo", "test"]
 
-entrypoint = "src/main.rs"
+entrypoint = "src/lib.rs"
 
 [packager]
 language = "rust"

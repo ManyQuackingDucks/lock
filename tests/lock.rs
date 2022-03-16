@@ -4,8 +4,8 @@ fn test_new(){
 }
 #[test]
 fn test_deref(){
-    static mut LOCK: lock::Lock<u8> = lock::Lock::new(5);
-    let mut guard  = unsafe { LOCK.lock().unwrap() };
+    static LOCK: lock::Lock<u8> = lock::Lock::new(5);
+    let mut guard  = LOCK.lock().unwrap();
     assert_eq!(5, *guard);
     *guard += 1;
     assert_eq!(6, *guard);
@@ -13,8 +13,8 @@ fn test_deref(){
 
 #[test]
 fn test_get_set(){
-    static mut LOCK: lock::Lock<u8> = lock::Lock::new(5);
-    let mut guard  = unsafe { LOCK.lock().unwrap() };
+    static LOCK: lock::Lock<u8> = lock::Lock::new(5);
+    let mut guard  = LOCK.lock().unwrap();
     assert_eq!(&5, guard.get());
     *guard.get_mut() += 1;
     assert_eq!(&6, guard.get());
@@ -23,21 +23,21 @@ fn test_get_set(){
 #[test]
 #[should_panic]
 fn test_poison(){
-    static mut LOCK: lock::Lock<u8> = lock::Lock::new(5);
+    static LOCK: lock::Lock<u8> = lock::Lock::new(5);
     std::thread::spawn(|| {
-        let _guard  = unsafe { LOCK.lock().unwrap() };
+        let _guard  = LOCK.lock().unwrap();
         panic!()//poison the guard
     }).join().unwrap_err();
-    let _guard = unsafe { LOCK.lock().unwrap() };
+    let _guard = LOCK.lock().unwrap();
 }
 
 #[test]
 fn test_force_unlock(){
-    static mut LOCK: lock::Lock<u8> = lock::Lock::new(5);
+    static LOCK: lock::Lock<u8> = lock::Lock::new(5);
     std::thread::spawn(|| {
-        let _guard  = unsafe { LOCK.lock().unwrap() };
+        let _guard  = LOCK.lock().unwrap();
         panic!()//poison the guard
     }).join().unwrap_err();
     unsafe{ LOCK.force_unlock() };
-    let _guard = unsafe { LOCK.lock().unwrap() };
+    let _guard = LOCK.lock().unwrap();
 }

@@ -4,8 +4,8 @@ use std::thread;
 
 ///Guard SHOULD NEVER be shared between threads so Guard will never implement copy or clone and new will never be pub
 pub struct Guard<'a, T> {
-    state: &'a mut Cell<super::State>,
-    data: &'a mut UnsafeCell<T>,
+    state: &'a Cell<super::State>,
+    data: &'a UnsafeCell<T>,
 }
 impl<'a, T> Guard<'a, T> {
     #[allow(clippy::missing_const_for_fn)] //Not stable in rust yet
@@ -13,16 +13,16 @@ impl<'a, T> Guard<'a, T> {
         unsafe { &*self.data.get() }
     }
     pub fn get_mut(&mut self) -> &mut T {
-        self.data.get_mut()
+        unsafe { &mut *self.data.get() }
     }
-    pub(super) fn new(state: &'a mut Cell<super::State>, data: &'a mut UnsafeCell<T>) -> Self {
+    pub(super) const fn new(state: &'a Cell<super::State>, data: &'a UnsafeCell<T>) -> Self {
         Self { state, data }
     }
 }
 
 impl<'a, T> Drop for Guard<'a, T> {
     fn drop(&mut self) {
-        //If the method containg Guard panics then the data of the Guard is considered poisoned
+        //If the method holding a Guard panics then the data of the Guard is considered poisoned
         if thread::panicking() {
             self.state.set(super::State::Poisoned);
         } else {
