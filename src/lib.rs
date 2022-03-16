@@ -6,7 +6,7 @@ extern crate std;
 use core::cell::{Cell, UnsafeCell};
 pub mod error;
 mod guard;
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum State {
     Avaiable = 1,
     Locked = 2,

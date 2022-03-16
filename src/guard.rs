@@ -2,6 +2,7 @@ use core::cell::{Cell, UnsafeCell};
 use core::ops::{Deref, DerefMut};
 
 ///Guard SHOULD NEVER be shared between threads so Guard will never implement copy or clone and new will never be pub
+#[derive(Debug)]
 pub struct Guard<'a, T> {
     state: &'a Cell<super::State>,
     data: &'a UnsafeCell<T>,

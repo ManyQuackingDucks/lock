@@ -5,7 +5,6 @@ pub enum Kind {
 }
 
 impl core::fmt::Display for Kind {
-    #[cfg(not(tarpaulin_include))] //We dont expect the formater to be tested
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::AlreadyLocked => write!(f, "The state is already locked and it could not lock"),

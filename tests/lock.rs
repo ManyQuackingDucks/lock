@@ -11,6 +11,7 @@ fn test_deref(){
     assert_eq!(6, *guard);
 }
 
+
 #[test]
 fn test_get_set(){
     static LOCK: lock::Lock<u8> = lock::Lock::new(5);
