@@ -1,6 +1,5 @@
-use std::cell::{Cell, UnsafeCell};
-use std::ops::{Deref, DerefMut};
-use std::thread;
+use core::cell::{Cell, UnsafeCell};
+use core::ops::{Deref, DerefMut};
 
 ///Guard SHOULD NEVER be shared between threads so Guard will never implement copy or clone and new will never be pub
 pub struct Guard<'a, T> {
@@ -23,11 +22,14 @@ impl<'a, T> Guard<'a, T> {
 impl<'a, T> Drop for Guard<'a, T> {
     fn drop(&mut self) {
         //If the method holding a Guard panics then the data of the Guard is considered poisoned
-        if thread::panicking() {
+        #[cfg(feature = "std")]
+        if std::thread::panicking() {
             self.state.set(super::State::Poisoned);
         } else {
             self.state.set(super::State::Avaiable);
         }
+        #[cfg(not(feature = "std"))]
+        self.state.set(super::State::Avaiable)
     }
 }
 

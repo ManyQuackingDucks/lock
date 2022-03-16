@@ -1,13 +1,16 @@
 #![warn(clippy::pedantic)]
 #![warn(clippy::nursery)]
-use std::cell::{Cell, UnsafeCell};
+#![no_std]
+#[cfg(feature = "std")]
+extern crate std;
+use core::cell::{Cell, UnsafeCell};
 pub mod error;
 mod guard;
 #[derive(Clone, Copy, PartialEq)]
 pub enum State {
-    Avaiable,
-    Locked,
-    Poisoned,
+    Avaiable = 1,
+    Locked = 2,
+    Poisoned = 3,
 }
 
 pub struct Lock<T> {

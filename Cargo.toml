@@ -1,13 +1,18 @@
 [package]
 name = "lock"
 version = "0.1.0"
-authors = ["runner"]
+authors = ["duck"]
 edition = "2021"
 description = "A simple lock that can be used in a static mut"
 license = "MIT"
 documentation = ""
 homepage = ""
-repository = ""
+repository = "https://github.com/ManyQuackingDucks/lock"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+
+[features]
+default-feature = ["std"]
+std = []

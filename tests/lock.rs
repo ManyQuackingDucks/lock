@@ -20,6 +20,7 @@ fn test_get_set(){
     assert_eq!(&6, guard.get());
 }
 
+#[cfg(feature = "std")]
 #[test]
 #[should_panic]
 fn test_poison(){
