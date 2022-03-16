@@ -29,6 +29,7 @@ impl<'a, T> Drop for Guard<'a, T> {
             self.state.set(super::State::Avaiable);
         }
         #[cfg(not(feature = "std"))]
+        #[cfg(not(tarpaulin_include))]//Taruplin wont compile this
         self.state.set(super::State::Avaiable)
     }
 }
