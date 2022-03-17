@@ -3,18 +3,14 @@
 #![no_std]
 #[cfg(feature = "std")]
 extern crate std;
-use core::cell::{Cell, UnsafeCell};
+
+use core::cell::UnsafeCell;
 pub mod error;
 mod guard;
-#[derive(Clone, Copy, PartialEq, Debug)]
-pub enum State {
-    Avaiable = 1,
-    Locked = 2,
-    Poisoned = 3,
-}
+pub mod lock_state;
 
 pub struct Lock<T> {
-    state: Cell<State>,
+    state: lock_state::LockState,
     data: UnsafeCell<T>,
 }
 //Is safe because state and data cannot be moddifed when poisoned or locked EXCEPT if force unlock is ran.
@@ -22,26 +18,26 @@ unsafe impl<T> Sync for Lock<T> {}
 impl<T> Lock<T> {
     pub const fn new(data: T) -> Self {
         Self {
-            state: Cell::new(State::Avaiable),
+            state: lock_state::LockState::new(),
             data: UnsafeCell::new(data),
         }
     }
     pub fn lock(&self) -> Result<guard::Guard<T>, error::Kind> {
-        if self.state.get() == State::Poisoned {
+        if self.is_poisoned() {
             return Err(error::Kind::Poisoned);
         }
-        while self.state.get() == State::Locked {}
-        self.state.set(State::Locked);
+        while !self.is_avaiable() {}
+        self.state.state_lock();
 
         Ok(guard::Guard::new(&self.state, &self.data))
     }
     #[allow(dead_code)]
     pub fn try_lock(&self) -> Result<guard::Guard<T>, error::Kind> {
-        if self.state.get() == State::Poisoned {
+        if self.is_poisoned() {
             return Err(error::Kind::Poisoned);
         }
-        if self.state.get() == State::Avaiable {
-            self.state.set(State::Locked);
+        if self.is_avaiable() {
+            self.state.state_lock();
             Ok(guard::Guard::new(&self.state, &self.data))
         } else {
             Err(error::Kind::AlreadyLocked)
@@ -50,7 +46,21 @@ impl<T> Lock<T> {
     /// # Safety
     /// Make sure all guards have been droped BEFORE calling.
     pub unsafe fn force_unlock(&self) {
-        self.state.set(State::Avaiable);
+        self.state.poison_bypass();
+        self.state.state_unlock();
+    }
+
+    pub fn is_poisoned(&self) -> bool {
+        self.state.is_poisoned()
+    }
+
+    pub fn is_avaiable(&self) -> bool {
+        !self.state.is_locked()
+    }
+
+    pub fn unpoison(&self) {
+        if self.is_poisoned() {
+            self.state.poison_bypass();
+        }
     }
 }
-
